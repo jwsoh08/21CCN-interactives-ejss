@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet"  type="text/css" href="file:///Users/localid/Projects/21CCN/ejss/interactives/output/_ejs_library/css/ejss.css" />
+    <link rel="stylesheet"  type="text/css" href="file:///Users/localid/Projects/21CCN/ejss/interactives/source/zombie-game/zombie-game.css" />
+    <script src="file:///Users/localid/Projects/21CCN/ejss/JavaScript_EJS_6.1 BETA_201115/bin/javascript/lib/scripts/common_script.js"></script>
+    <script src="file:///Users/localid/Projects/21CCN/ejss/JavaScript_EJS_6.1 BETA_201115/bin/javascript/lib/scripts/textresizedetector.js"></script>
+    <script src="file:///Users/localid/Projects/21CCN/ejss/JavaScript_EJS_6.1 BETA_201115/bin/javascript/lib/ejsS.v1.min.js"></script>
+    <script src="file:///Users/localid/Projects/21CCN/ejss/interactives/source/zombie-game/matter.min.js"></script>
+
+<script type="text/javascript"><!--//--><![CDATA[//><!--
+function zombieGame(_topFrame,_libraryPath,_codebasePath, _inputParameters) {
+  var _model = EJSS_CORE.createAnimationLMS();
+  var _view;
+  var _isPlaying = false;
+  var _isPaused = true;
+  var _isMobile = (navigator===undefined) ? false : navigator.userAgent.match(/iPhone|iPad|iPod|Android|BlackBerry|Opera Mini|IEMobile/i);
+
+var _stringProperties = {};
+  var _tools = EJSS_CORE.Tools;
+  function _play()  { _isPaused = false; _isPlaying = true;  _model.play();  }
+  function _pause() { _isPaused = true;  _isPlaying = false; _model.pause(); }
+  function _step()  { _pause();  _model.step(); }
+  function _reset() { _model.reset();  _isPaused = _model.isPaused(); _isPlaying = _model.isPlaying(); }
+  _model._play  = _play;
+  _model._pause = _pause;
+  _model._step  = _step;
+  _model._reset = _reset;
+  function _update() { _model.update(); }
+  function _initialize() { _model.initialize(); }
+  function _setFPS(_fps) { _model.setFPS(_fps); }
+  function _setDelay(_delay) { _model.setDelay(_delay); }
+  function _setStepsPerDisplay(_spd) { _model.setStepsPerDisplay(_spd); }
+  function _setUpdateView(_updateView) { _model.setUpdateView(_updateView); }
+  function _setAutoplay(_auto) { _model.setAutoplay(_auto); }
+  function _println(_message) { console.log(_message); }
+
+  function _breakAfterThisPage() { _model.setShouldBreak(true); }
+
+  function _resetSolvers() { if (_model.resetSolvers) _model.resetSolvers(); }
+
+  function _saveText(name,type,content) { if (_model.saveText) _model.saveText(name,type,content); }
+
+  function _saveState(name) { if (_model.saveState) _model.saveState(name); }
+
+  function _saveImage(name,panelname) { if (_model.saveImage) _model.saveImage(name,panelname); }
+
+  function _readState(url,type) { if (_model.readState) _model.readState(url,type); }
+
+  function _readText(url,type,varname) { if (_model.readText) _model.readText(url,type,varname); }
+
+  function _getStringProperty(propertyName) {
+    var _value = _stringProperties[propertyName];
+    if (_value===undefined) return propertyName;
+    else return _value;
+  }
+  var __pagesEnabled = [];
+  function _setPageEnabled(pageName,enabled) { __pagesEnabled[pageName] = enabled; }
+
+  _model.getOdes = function() { return []; };
+
+  _model.removeEvents = function(){
+  };
+
+  function _serialize() { return _model.serialize(); }
+
+  _model._userSerialize = function() {
+    return {
+
+    };
+  };
+
+  _model._readParameters = function(json) {
+  };
+
+  function _unserialize(json) { return _model.unserialize(json); }
+
+  _model.addToReset(function() {
+    __pagesEnabled["gameLoop"] = true;
+  });
+
+  if (_inputParameters) {
+    _inputParameters = _model.parseInputParameters(_inputParameters);
+    if (_inputParameters) _model.addToReset(function() { _model._readParameters(_inputParameters); });
+  }
+
+  _model.addToReset(function() {
+    _model.setAutoplay(false);
+    _model.setFPS(20);
+    _model.setStepsPerDisplay(1);
+  });
+
+  class Zombie {  // > CustomCode.Zombie:1
+      constructor(x, y, width, height) {  // > CustomCode.Zombie:2
+          this.x = x;  // > CustomCode.Zombie:3
+          this.y = y;  // > CustomCode.Zombie:4
+          this.width = width;  // > CustomCode.Zombie:5
+          this.height = height;  // > CustomCode.Zombie:6
+          this.gender = "male";  // > CustomCode.Zombie:7
+          // initial state of zombie  // > CustomCode.Zombie:8
+          this.state = {  // > CustomCode.Zombie:9
+              action: 'idle', // possible actions: walk, idle, attack, jump   // > CustomCode.Zombie:10
+              direction: 1 // 1: face right, -1: face left  // > CustomCode.Zombie:11
+          }  // > CustomCode.Zombie:12
+          // sprite sheet management system  // > CustomCode.Zombie:13
+          this.spriteSheet = new Image();  // > CustomCode.Zombie:14
+          this.spriteSheet.src = `zombie-game/zombie/${this.gender}/${this.state.action}-${this.#convertIntegerDirectionToWord()}.png`;  // > CustomCode.Zombie:15
+          this.spriteSheets = {  // > CustomCode.Zombie:16
+              walk: {  // > CustomCode.Zombie:17
+                  width: 215,  // > CustomCode.Zombie:18
+                  height: 260,  // > CustomCode.Zombie:19
+                  numOfFrames: 10,  // > CustomCode.Zombie:20
+              },  // > CustomCode.Zombie:21
+              attack: {  // > CustomCode.Zombie:22
+                  width: 215,  // > CustomCode.Zombie:23
+                  height: 260,  // > CustomCode.Zombie:24
+                  numOfFrames: 8,  // > CustomCode.Zombie:25
+              },  // > CustomCode.Zombie:26
+              idle: {  // > CustomCode.Zombie:27
+                  width: 215,  // > CustomCode.Zombie:28
+                  height: 260,  // > CustomCode.Zombie:29
+                  numOfFrames: 15,  // > CustomCode.Zombie:30
+              },  // > CustomCode.Zombie:31
+              dead: {  // > CustomCode.Zombie:32
+                  width: 263,  // > CustomCode.Zombie:33
+                  height: 315,  // > CustomCode.Zombie:34
+                  numOfFrames: 12,  // > CustomCode.Zombie:35
+              },  // > CustomCode.Zombie:36
+          }  // > CustomCode.Zombie:37
+          this.frameWidth = 215; // Width of each frame in the sprite sheet  // > CustomCode.Zombie:38
+          this.frameHeight = 260; // Height of each frame in the sprite sheet  // > CustomCode.Zombie:39
+          this.totalFrames = 15; // Number of frames in the sprite sheet  // > CustomCode.Zombie:40
+          this.currentFrame = 0; // Current frame index  // > CustomCode.Zombie:41
+          this.frameRate = 100; // Milliseconds between each frame change  // > CustomCode.Zombie:42
+          this.lastFrameUpdateTime = 0;  // > CustomCode.Zombie:43
+          this.moveSpeed = 5; // Speed of the game object's movement  // > CustomCode.Zombie:44
+          this.isMovingLeft = false;  // > CustomCode.Zombie:45
+          this.isMovingRight = false;  // > CustomCode.Zombie:46
+          this.isIdling = true;  // > CustomCode.Zombie:47
+          this.isInAir = false;  // > CustomCode.Zombie:48
+          this.world = undefined; // used to get information about other objects  // > CustomCode.Zombie:49
+          // Create a Matter.js body for the game object  // > CustomCode.Zombie:50
+          this.body = Matter.Bodies.rectangle(x + this.width / 2, y + height / 2, this.width, height, {  // > CustomCode.Zombie:51
+              friction: 0.1, // When two bodies collide in Matter.js, the friction between them determines how much they resist sliding against each other.  // > CustomCode.Zombie:52
+              restitution: 0.1,  // > CustomCode.Zombie:53
+          });  // > CustomCode.Zombie:54
+      }  // > CustomCode.Zombie:55
+      // utilities   // > CustomCode.Zombie:56
+      #convertIntegerDirectionToWord() {  // > CustomCode.Zombie:57
+          return this.state.direction === -1 ? 'left' : 'right';  // > CustomCode.Zombie:58
+      }  // > CustomCode.Zombie:59
+      update() {  // > CustomCode.Zombie:60
+          this.updateSpriteSheet();  // > CustomCode.Zombie:61
+          this.updateFrame();  // > CustomCode.Zombie:62
+          // Get the updated position from the Matter.js body  // > CustomCode.Zombie:63
+          this.x = this.body.position.x - this.width / 2;  // > CustomCode.Zombie:64
+          this.y = this.body.position.y - this.height / 2;  // > CustomCode.Zombie:65
+          if (this.state.action === 'walk') {  // > CustomCode.Zombie:66
+              this.totalFrames = 10;  // > CustomCode.Zombie:67
+              Matter.Body.translate(this.body, { x: this.state.direction * this.moveSpeed, y: 0 });  // > CustomCode.Zombie:68
+          }  // > CustomCode.Zombie:69
+          if (this.state.action === 'attack' && this.currentFrame === 4) {  // > CustomCode.Zombie:70
+              let moveingObjectBody = (this.world.bodies.filter(body => body.id == 2))[0];  // > CustomCode.Zombie:71
+              let collisionRecord = Matter.Collision.collides(this.body, moveingObjectBody);  // > CustomCode.Zombie:72
+              // check that zombie and movingObject are in close proximity when zombie strikes down  // > CustomCode.Zombie:73
+              if (collisionRecord) {  // > CustomCode.Zombie:74
+                  // push the box back a little  // > CustomCode.Zombie:75
+                  Matter.Body.applyForce(moveingObjectBody, { x: moveingObjectBody.position.x, y: moveingObjectBody.position.y }, { x: .2, y: 0 }); // Apply an upward force  // > CustomCode.Zombie:76
+              }  // > CustomCode.Zombie:77
+          }  // > CustomCode.Zombie:78
+      }  // > CustomCode.Zombie:79
+      updateSpriteSheet() {  // > CustomCode.Zombie:80
+          if (this.state.action != 'jump') { // we don't have a jump spritesheet yet, so we don't update the sprite sheet while zombie is jumping  // > CustomCode.Zombie:81
+              const direction = this.#convertIntegerDirectionToWord();  // > CustomCode.Zombie:82
+              this.spriteSheet.src = `zombie-game/zombie/${this.gender}/${this.state.action}-${direction}.png`;  // > CustomCode.Zombie:83
+              this.frameWidth = this.spriteSheets[this.state.action].width;  // > CustomCode.Zombie:84
+              this.frameHeight = this.spriteSheets[this.state.action].height;  // > CustomCode.Zombie:85
+              this.totalFrames = this.spriteSheets[this.state.action].numOfFrames;  // > CustomCode.Zombie:86
+          }  // > CustomCode.Zombie:87
+      }  // > CustomCode.Zombie:88
+      updateFrame() {  // > CustomCode.Zombie:89
+          // this function displays the correct frame within the current active spritesheet  // > CustomCode.Zombie:90
+          const time = Date.now();  // > CustomCode.Zombie:91
+          if (time - this.lastFrameUpdateTime > this.frameRate) {  // > CustomCode.Zombie:92
+              this.currentFrame = (this.currentFrame + 1) % this.totalFrames;  // > CustomCode.Zombie:93
+              this.lastFrameUpdateTime = time;  // > CustomCode.Zombie:94
+          }  // > CustomCode.Zombie:95
+      }  // > CustomCode.Zombie:96
+      render(ctx) {  // > CustomCode.Zombie:97
+          // Draw the current frame of the sprite on the canvas  // > CustomCode.Zombie:98
+          ctx.drawImage(  // > CustomCode.Zombie:99
+              this.spriteSheet,  // > CustomCode.Zombie:100
+              this.currentFrame * this.frameWidth,  // > CustomCode.Zombie:101
+              0,  // > CustomCode.Zombie:102
+              this.frameWidth,  // > CustomCode.Zombie:103
+              this.frameHeight,  // > CustomCode.Zombie:104
+              this.x,  // > CustomCode.Zombie:105
+              this.y,  // > CustomCode.Zombie:106
+              this.width,  // > CustomCode.Zombie:107
+              this.height  // > CustomCode.Zombie:108
+          );  // > CustomCode.Zombie:109
+      }  // > CustomCode.Zombie:110
+      handleKeyDown(event) {  // > CustomCode.Zombie:111
+          const code = event.code;  // > CustomCode.Zombie:112
+          if (code === 'ArrowLeft' || code === 'ArrowRight') {  // > CustomCode.Zombie:113
+              this.state.action = 'walk';  // > CustomCode.Zombie:114
+              this.state.direction = (code.substring(5) === 'Left' ? -1 : 1);  // > CustomCode.Zombie:115
+          }  // > CustomCode.Zombie:116
+          if (code === 'Space') {  // > CustomCode.Zombie:117
+              this.state.action = 'jump';  // > CustomCode.Zombie:118
+              Matter.Body.applyForce(this.body, { x: this.body.position.x, y: this.body.position.y }, { x: 0, y: -0.3 }); // Apply an upward force  // > CustomCode.Zombie:119
+          }  // > CustomCode.Zombie:120
+          if (code === 'KeyP') {  // > CustomCode.Zombie:121
+              this.state.action = 'attack';  // > CustomCode.Zombie:122
+          }  // > CustomCode.Zombie:123
+      }  // > CustomCode.Zombie:124
+      handleKeyUp(event) {  // > CustomCode.Zombie:125
+          this.state.action = 'idle';  // > CustomCode.Zombie:126
+      }  // > CustomCode.Zombie:127
+  }  // > CustomCode.Zombie:128
+
+  class MovingGameObject {  // > CustomCode.MovingObject:1
+      constructor(x, y, width, height) {  // > CustomCode.MovingObject:2
+          this.x = x;  // > CustomCode.MovingObject:3
+          this.y = y;  // > CustomCode.MovingObject:4
+          this.width = width;  // > CustomCode.MovingObject:5
+          this.height = height;  // > CustomCode.MovingObject:6
+          this.moveSpeed = .1; // Speed of the automatic movement  // > CustomCode.MovingObject:7
+          this.direction = -1; // 1 for right, -1 for left  // > CustomCode.MovingObject:8
+          // Create a Matter.js body for the game object  // > CustomCode.MovingObject:9
+          this.body = Matter.Bodies.rectangle(x + width / 2, y + height / 2, width, height, {  // > CustomCode.MovingObject:10
+              friction: 0.2,  // > CustomCode.MovingObject:11
+              restitution: 0.6,  // > CustomCode.MovingObject:12
+          });  // > CustomCode.MovingObject:13
+          // Apply a constant horizontal force to create sliding motion  // > CustomCode.MovingObject:14
+          Matter.Body.applyForce(this.body, { x: this.body.position.x, y: this.body.position.y }, { x: 0.01, y: 0 });  // > CustomCode.MovingObject:15
+      }  // > CustomCode.MovingObject:16
+      update() {  // > CustomCode.MovingObject:17
+          // Update the position based on the Matter.js body  // > CustomCode.MovingObject:18
+          this.x = this.body.position.x - this.width / 2;  // > CustomCode.MovingObject:19
+          // Reverse the direction when the game object reaches the canvas boundary  // > CustomCode.MovingObject:20
+          // canvas.width = 600  // > CustomCode.MovingObject:21
+          // if (this.x <= 0 || this.x + this.width >= 600) {  // > CustomCode.MovingObject:22
+          //     this.direction *= -1;  // > CustomCode.MovingObject:23
+          // }  // > CustomCode.MovingObject:24
+          // Apply the horizontal movement  // > CustomCode.MovingObject:25
+          Matter.Body.translate(this.body, { x: this.moveSpeed * this.direction, y: 0 });  // > CustomCode.MovingObject:26
+      }  // > CustomCode.MovingObject:27
+      render(ctx) {  // > CustomCode.MovingObject:28
+          // Draw a simple rectangle representing the game object  // > CustomCode.MovingObject:29
+          ctx.fillStyle = 'red';  // > CustomCode.MovingObject:30
+          ctx.fillRect(this.x, this.y, this.width, this.height);  // > CustomCode.MovingObject:31
+      }  // > CustomCode.MovingObject:32
+  }  // > CustomCode.MovingObject:33
+
+  _model.addToInitialization(function() {
+    if (!__pagesEnabled["gameLoop"]) return;
+    // matter.js library included within the simulation's auxiliary files folder (i.e. path-to-workspace/source/test2/matter.min.js)  // > Initialization.gameLoop:1
+    // Create a _DEVELOPMENT constant. We'll set this to true while we're developing  // > Initialization.gameLoop:2
+    // the interactive, and false when we're ready to package and distribute it.  // > Initialization.gameLoop:3
+    // (This is, of course, optional - there are innumerable ways to manage your  // > Initialization.gameLoop:4
+    // development process.)  // > Initialization.gameLoop:5
+    // set DEBUG_MODE to true for development.  // > Initialization.gameLoop:6
+    const DEBUG_MODE = true;  // > Initialization.gameLoop:7
+    // module aliases  // > Initialization.gameLoop:8
+    var Engine = Matter.Engine,  // > Initialization.gameLoop:9
+        Render = Matter.Render,  // > Initialization.gameLoop:10
+        Runner = Matter.Runner,  // > Initialization.gameLoop:11
+        Bodies = Matter.Bodies,  // > Initialization.gameLoop:12
+        Composite = Matter.Composite;  // > Initialization.gameLoop:13
+    const canvas = document.getElementById('gameCanvas');  // > Initialization.gameLoop:14
+    const ctx = canvas.getContext('2d');  // > Initialization.gameLoop:15
+    // Initialize the Matter.js engine   // > Initialization.gameLoop:16
+    var engine = Engine.create();  // > Initialization.gameLoop:17
+    // Add physical gravity to world  // > Initialization.gameLoop:18
+    engine.gravity.y = .5;  // > Initialization.gameLoop:19
+    // create a renderer  // > Initialization.gameLoop:20
+    var render = Render.create({  // > Initialization.gameLoop:21
+        element: DEBUG_MODE ? document.body : canvas,  // > Initialization.gameLoop:22
+        engine: engine  // > Initialization.gameLoop:23
+    });  // > Initialization.gameLoop:24
+    // Bodies  // > Initialization.gameLoop:25
+    const zombie = new Zombie(50, 200, 100, 100);  // > Initialization.gameLoop:26
+    const movingObject = new MovingGameObject(500, 200, 100, 100);  // > Initialization.gameLoop:27
+    const ground = Matter.Bodies.rectangle(canvas.width / 2, canvas.height - 10, canvas.width, 20, { isStatic: true });  // > Initialization.gameLoop:28
+    // add all of the bodies to the world  // > Initialization.gameLoop:29
+    Composite.add(engine.world, [zombie.body, movingObject.body, ground]);  // > Initialization.gameLoop:30
+    // for zombie to learn about other bodies in the same world  // > Initialization.gameLoop:31
+    zombie.world = engine.world;  // > Initialization.gameLoop:32
+    console.log(zombie.world);  // > Initialization.gameLoop:33
+    // run the renderer  // > Initialization.gameLoop:34
+    Render.run(render);  // > Initialization.gameLoop:35
+    // create runner  // > Initialization.gameLoop:36
+    var runner = Runner.create();  // > Initialization.gameLoop:37
+    // run the engine  // > Initialization.gameLoop:38
+    Runner.run(runner, engine);  // > Initialization.gameLoop:39
+    function gameLoop() {  // > Initialization.gameLoop:40
+        // May need to update the Matter.js engine  // > Initialization.gameLoop:41
+        // Matter.Engine.update(engine);  // > Initialization.gameLoop:42
+        // Clear the canvas  // > Initialization.gameLoop:43
+        ctx.clearRect(0, 0, canvas.width, canvas.height);  // > Initialization.gameLoop:44
+        // Render graphics  // > Initialization.gameLoop:45
+        zombie.render(ctx);  // > Initialization.gameLoop:46
+        movingObject.render(ctx);  // > Initialization.gameLoop:47
+        // Update game objects   // > Initialization.gameLoop:48
+        zombie.update();  // > Initialization.gameLoop:49
+        movingObject.update();  // > Initialization.gameLoop:50
+        // Request the next frame  // > Initialization.gameLoop:51
+        requestAnimationFrame(gameLoop);  // > Initialization.gameLoop:52
+    }  // > Initialization.gameLoop:53
+    // Add event listeners for keydown and keyup events  // > Initialization.gameLoop:54
+    document.addEventListener('keydown', function (event) {  // > Initialization.gameLoop:55
+        zombie.handleKeyDown(event);  // > Initialization.gameLoop:56
+    });  // > Initialization.gameLoop:57
+    document.addEventListener('keyup', function (event) {  // > Initialization.gameLoop:58
+        zombie.handleKeyUp(event);  // > Initialization.gameLoop:59
+    });  // > Initialization.gameLoop:60
+    gameLoop();  // > Initialization.gameLoop:61
+  });
+
+  _model.addToFixedRelations(function() { _isPaused = _model.isPaused(); _isPlaying = _model.isPlaying(); });
+
+  _model.addToFixedRelations(function() { _isPaused = _model.isPaused(); _isPlaying = _model.isPlaying(); });
+
+    _model._fontResized = function(iBase,iSize,iDelta) {
+      _view._fontResized(iBase,iSize,iDelta);
+  }; // end of _fontResized
+
+  function _getViews() {
+    var _viewsInfo = [];
+    var _counter = 0;
+    _viewsInfo[_counter++] = { name : "test2", width : null, height : null };
+    return _viewsInfo;
+  } // end of _getViews
+
+  function _selectView(_viewNumber) {
+    _view = null;
+    _view = new zombieGame_View(_topFrame,_viewNumber,_libraryPath,_codebasePath);
+    var _view_super_reset = _view._reset;
+    _view._reset = function() {
+      _view_super_reset();
+      switch(_viewNumber) {
+        case -10 : break; // make Lint happy
+        default :
+        case 0:
+          break;
+      } // end of switch
+    }; // end of new reset
+
+    _model.setView(_view);
+    _model.reset();
+    _view._enableEPub();
+  } // end of _selectView
+
+  _model.setAutoplay(false);
+  _model.setFPS(20);
+  _model.setStepsPerDisplay(1);
+  _selectView(-1); // this includes _model.reset()
+  return _model;
+}
+
+function zombieGame_View (_topFrame,_viewNumber,_libraryPath,_codebasePath) {
+  var _view;
+  switch(_viewNumber) {
+    case -10 : break; // make Lint happy
+    default :
+    case 0: _view = zombieGame_View_0 (_topFrame); break;
+  } // end of switch
+
+  if (_codebasePath) _view._setResourcePath(_codebasePath);
+
+  if (_libraryPath) _view._setLibraryPath(_libraryPath);
+
+
+  return _view;
+} // end of main function
+
+function zombieGame_View_0 (_topFrame) {
+  var _view = EJSS_CORE.createView(_topFrame);
+
+  _view._reset = function() {
+    _view._clearAll();
+    _view._addElement(EJSS_INTERFACE.panel,"gameScreen", _view._topFrame) // EJsS HtmlView.test2: declaration of element 'gameScreen'
+      .setProperty("Html","<canvas id=\"gameCanvas\" width=\"800\" height=\"400\" style=\"border: 1px solid black; margin: 0 auto;\"></canvas>") // EJsS HtmlView.test2: setting property 'Html' for element 'gameScreen'
+      ;
+
+  };
+
+  return _view;
+}
+
+
+//--><!]]></script>
+  </head>
+  <body>
+    <div role="button" id="_topFrame" style="text-align:center"></div>
+  <div id="metadata" class="metadata">
+    <br />
+    <div id="title_author">
+      <hr />
+      <b>Title and author:</b>
+      <p>
+      </p>
+      <p>
+ Author name
+      </p>
+    </div>
+    <hr />
+    <p></p>
+    <div id="copyright_message">
+      <div class="cc_left"  style="float:left">&#169; 2023, Author name. Compiled with EJS 6.1 BETA (201115)
+</div>
+      <div class="cc_right" style="float:right">    Released under a <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US"> <img alt="Creative Commons Attribution-NonCommercial-ShareAlike" src="file:///Users/localid/Projects/21CCN/ejss/JavaScript_EJS_6.1 BETA_201115/bin/javascript/lib/images/cc_icon.png" /> </a> license.</div>
+    </div>
+  </div>
+    <script type="text/javascript"><!--//--><![CDATA[//><!--
+      var _model;
+      var _scorm;
+      window.addEventListener('load',
+        function () { 
+          _model =  new zombieGame("_topFrame","file:/Users/localid/Projects/21CCN/ejss/JavaScript_EJS_6.1%20BETA_201115/bin/javascript/lib/","file:/Users/localid/Projects/21CCN/ejss/interactives/source/");
+          if (typeof _isApp !== "undefined" && _isApp) _model.setRunAlways(true);
+          TextResizeDetector.TARGET_ELEMENT_ID = '_topFrame';
+          TextResizeDetector.USER_INIT_FUNC = function () {
+            var iBase = TextResizeDetector.addEventListener(function(e,args) {
+              _model._fontResized(args[0].iBase,args[0].iSize,args[0].iDelta);
+              },null);
+            _model._fontResized(iBase);
+          };
+          _model.onload();
+        }, false);
+    //--><!]]></script>
+  </body>
+</html>
